@@ -10,8 +10,12 @@ def handle_rough_command(rough_commands):
     result_command = []
     rough_commands = rough_commands.split("\\n") # 1
     for command in rough_commands:
-        command = command.split() # 2
-        result_command.append(command)
+        if command.startswith('`') and command.endswith('`'):
+            result_command.append(command)
+        else:
+            command = command.split() # 2
+            for i in command:
+                result_command.append(i)
     return result_command
 
 
@@ -25,6 +29,14 @@ def handle_execute_command(command):
     # only dot "."
     if len(command) == 1 and command[0] == ".":
         print("bash: .: filename argument required\n.: usage: . filename [arguments]")
+    elif command.startswith('`') and command.endswith('`'):
+        list_command_2 = handle_rough_command(command[1:-1])
+        if len(list_command_2) == 1:
+            subprocess.run([list_command_2[0]])
+        else:
+            for command in list_command_2[1:]:
+                print(command)
+                subprocess.run([list_command_2[0],command])
 
     # 1 VARIABLE
     elif "=" in command[0]:
@@ -52,7 +64,6 @@ def handle_execute_command(command):
             else:
                 for arg in command[1:]:
                     subprocess.run([command[0], arg])
-
 
 
 def handle_path(command):

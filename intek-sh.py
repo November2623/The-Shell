@@ -28,6 +28,7 @@ def main():
         if rough_commands != '':
             list_command = handle_rough_command(rough_commands) # 3
             for command in list_command:
+                # print(command)
                 ########## using it when you implement the features
                 # handled_command = identify_command(command) # 4
                 # handle_execute_command(handled_command) # 5
