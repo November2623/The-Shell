@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os, subprocess
+from Backquotes import command_substitution
 
 
 def handle_rough_command(rough_commands):
@@ -26,17 +27,18 @@ def identify_command():
 
 def handle_execute_command(command):
     dic_var = {}
+    print(command)
     # only dot "."
     if len(command) == 1 and command[0] == ".":
         print("bash: .: filename argument required\n.: usage: . filename [arguments]")
-    elif command.startswith('`') and command.endswith('`'):
-        list_command_2 = handle_rough_command(command[1:-1])
-        if len(list_command_2) == 1:
-            subprocess.run([list_command_2[0]])
-        else:
-            for command in list_command_2[1:]:
-                print(command)
-                subprocess.run([list_command_2[0],command])
+    elif check_command_substitution(command):
+        command_substitution(command)
+    #     list_command_2 = handle_rough_command(command[1:-1])
+    #     if len(list_command_2) == 1:
+    #         subprocess.run([list_command_2[0]])
+    #     else:
+    #         for command in list_command_2[1:]:
+    #             subprocess.run([list_command_2[0],command])
 
     # 1 VARIABLE
     elif "=" in command[0]:
@@ -53,7 +55,7 @@ def handle_execute_command(command):
     # 3 bultin-name or external-file or script
     else:
         if check_exists_command(command[0]) == "non_PATH":
-            print("intek-sh: " + command[0] + ": No such file or directory")
+            print("intek-sh: " + command + ": No such file or directory")
         elif check_exists_command(command[0]) == "notfound":
             print("intek-sh: %s: command not found" % command[0])
         elif check_exists_command(command[0]) == "buildin":
@@ -73,6 +75,13 @@ def handle_path(command):
     else:
         path = command[0]
     return path
+
+
+def check_command_substitution(command):
+    for i in command:
+        if i.startswith('`') and i.endswith('`'):
+            return True
+    return False
 
 
 def check_path(path, command):
